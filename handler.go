@@ -128,6 +128,10 @@ func (h *Handler) ContextHandler(ctx context.Context, w http.ResponseWriter, r *
 	// get query
 	opts := NewRequestOptions(r)
 
+	// send the authorization header with the root object
+	root := make(map[string]interface{})
+	root["Authorization"] = r.Header.Get("Authorization")
+
 	// execute graphql query
 	params := graphql.Params{
 		Schema:         *h.Schema,
@@ -135,6 +139,7 @@ func (h *Handler) ContextHandler(ctx context.Context, w http.ResponseWriter, r *
 		VariableValues: opts.Variables,
 		OperationName:  opts.OperationName,
 		Context:        ctx,
+		RootObject:     root,
 	}
 	if h.rootObjectFn != nil {
 		params.RootObject = h.rootObjectFn(ctx, r)
